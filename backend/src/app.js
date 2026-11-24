@@ -2,9 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 
+const authRoutes = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const { protect } = require('./middleware/auth');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -28,7 +30,8 @@ app.get('/', (req, res) => {
   res.json({
     success: true,
     message: 'Employee & Task Management API. All endpoints are under /api',
-    endpoints: ['/api/health', '/api/dashboard', '/api/employees', '/api/tasks', '/api/tasks/export/csv'],
+    auth: 'POST /api/auth/login to get a token, then send "Authorization: Bearer <token>"',
+    endpoints: ['/api/health', '/api/auth/login', '/api/dashboard', '/api/employees', '/api/tasks', '/api/tasks/export/csv'],
   });
 });
 
@@ -36,9 +39,12 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'API is running' });
 });
 
-app.use('/api/employees', employeeRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/auth', authRoutes);
+
+// Everything below needs a logged-in user (valid JWT token)
+app.use('/api/employees', protect, employeeRoutes);
+app.use('/api/tasks', protect, taskRoutes);
+app.use('/api/dashboard', protect, dashboardRoutes);
 
 // Note: Express 5 automatically sends errors from async route handlers to errorHandler
 app.use(notFound);
