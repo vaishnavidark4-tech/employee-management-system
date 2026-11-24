@@ -23,6 +23,15 @@ app.use(
 app.use(express.json({ limit: '100kb' }));
 if (process.env.NODE_ENV !== 'test') app.use(morgan('dev'));
 
+// Base URL: small info message instead of "Route not found"
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Employee & Task Management API. All endpoints are under /api',
+    endpoints: ['/api/health', '/api/dashboard', '/api/employees', '/api/tasks', '/api/tasks/export/csv'],
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'API is running' });
 });

@@ -10,8 +10,11 @@ The frontend also validates fields for a better user experience, but it never re
 
 | | Link |
 |---|---|
-| Frontend (live) | `<add frontend URL here>` |
-| Backend API (live) | `<add backend URL here>` (health check: `/api/health`) |
+| Frontend (live) | https://employee-management-app-164s.onrender.com |
+| Backend API (live) | https://employee-management-system-95gp.onrender.com/api (health check: [`/api/health`](https://employee-management-system-95gp.onrender.com/api/health)) |
+| Database | MongoDB Atlas |
+
+> Hosted on Render's free plan. If the site was not used for a while, the backend sleeps and the **first request can take about 30-50 seconds** to wake up. After that it is fast.
 
 ---
 
@@ -380,17 +383,16 @@ Each request is correct on its own, but together they break the limit. In my cur
 
 ## Deployment
 
-One free setup that works (any similar host is fine):
+The live version is deployed for free on **MongoDB Atlas + Render**:
 
-1. **Database – MongoDB Atlas:** create a free cluster, a database user, allow network access (`0.0.0.0/0` for Render) and copy the connection string.
-2. **Backend – Render (Web Service):**
-   - Root directory: `backend`, build command: `npm install`, start command: `npm start`
+1. **Database – MongoDB Atlas:** free cluster, a database user, network access `0.0.0.0/0` (so Render can connect) and the connection string with the database name `employee_task_db`. Demo data was added with `npm run seed`.
+2. **Backend – Render Web Service:**
+   - Root directory: `backend`, build command: `npm install`, start command: `npm start`, health check path: `/api/health`
    - Environment: `MONGO_URI=<atlas uri>`, `CLIENT_URL=<frontend url>`, `TZ=Asia/Kolkata`, `NODE_ENV=production`
-   - Optional: run `npm run seed` once from the Render shell to add demo data.
-3. **Frontend – Netlify or Vercel:**
-   - Base directory: `frontend`, build command: `npm run build`, publish directory: `dist`
-   - Environment: `VITE_API_URL=<render backend url>/api`
-   - Page refresh on routes like `/tasks/123` works because of `public/_redirects` (Netlify) and `vercel.json` (Vercel).
-4. Put both URLs at the top of this README.
+3. **Frontend – Render Static Site:**
+   - Root directory: `frontend`, build command: `npm install && npm run build`, publish directory: `dist`
+   - Environment: `VITE_API_URL=<backend url>/api`
+   - Rewrite rule `/*` → `/index.html`, so refreshing routes like `/tasks/123` works (React Router handles them).
+   - The project also works on Netlify (`public/_redirects`) and Vercel (`vercel.json`).
 
 > Note: on Render's free plan the backend sleeps when unused, so the first request can take around 30-50 seconds.
