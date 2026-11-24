@@ -1,0 +1,535 @@
+/* ==========================================================
+   Global styles (Bootstrap is the base, these are the custom parts)
+   ========================================================== */
+
+:root {
+  --brand: #8b3a3a;
+  --brand-dark: #6f2d2d;
+  --brand-light: #f6eaea;
+  --dark: #212529;
+  --page-bg: #f4f5f7;
+  --card-border: #e3e5e8;
+  --muted: #6c757d;
+}
+
+body {
+  background-color: var(--page-bg);
+  color: var(--dark);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ---------- Layout ---------- */
+
+.app-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1;
+  padding: 1.5rem 0 2rem;
+}
+
+.app-footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+  padding: 1rem;
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.app-brand-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background-color: var(--brand);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.navbar .nav-link.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ---------- Page header ---------- */
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.page-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: var(--muted);
+  margin: 0.25rem 0 0;
+}
+
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+  text-decoration: none;
+  margin-bottom: 0.25rem;
+}
+
+.back-link:hover {
+  color: var(--brand);
+}
+
+/* ---------- Cards ---------- */
+
+.app-card {
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.card-title-sm {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* ---------- Brand button + custom badge colours ---------- */
+
+.btn-brand {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--brand);
+  --bs-btn-border-color: var(--brand);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--brand-dark);
+  --bs-btn-hover-border-color: var(--brand-dark);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--brand-dark);
+  --bs-btn-active-border-color: var(--brand-dark);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: var(--brand);
+  --bs-btn-disabled-border-color: var(--brand);
+}
+
+.btn-outline-brand {
+  --bs-btn-color: var(--brand);
+  --bs-btn-border-color: var(--brand);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--brand);
+  --bs-btn-hover-border-color: var(--brand);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--brand-dark);
+  --bs-btn-active-border-color: var(--brand-dark);
+}
+
+.bg-cancelled { background-color: #9c4a2f !important; }
+.bg-low { background-color: #6c9a8b !important; }
+.bg-medium { background-color: #d08c2b !important; }
+.bg-high { background-color: #d9534f !important; }
+.bg-critical { background-color: #7a1f3d !important; }
+
+.status-badge {
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.4em 0.65em;
+}
+
+/* ---------- Filters ---------- */
+
+.filter-card {
+  padding: 1rem 1.25rem;
+}
+
+.search-box {
+  max-width: 460px;
+  width: 100%;
+}
+
+.date-range-menu {
+  width: 270px;
+  padding: 0.75rem;
+}
+
+/* ---------- Tables ---------- */
+
+.data-table {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+.data-table thead th {
+  background-color: var(--dark);
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+  border-color: var(--dark);
+}
+
+.data-table td {
+  vertical-align: middle;
+}
+
+.data-table .cell-title {
+  min-width: 180px;
+}
+
+.table-link {
+  color: inherit;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.table-link:hover {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+.overdue-text {
+  color: #c0392b;
+  font-weight: 700;
+}
+
+.action-toggle {
+  color: var(--dark);
+  padding: 0.15rem 0.4rem;
+}
+
+.action-toggle::after {
+  display: none; /* hide default dropdown arrow, we show the three dots icon */
+}
+
+.status-toggle {
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3em 0.65em;
+  white-space: nowrap;
+}
+
+.table-wrapper {
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+}
+
+.data-table thead th:first-child {
+  border-top-left-radius: 9px;
+}
+
+.data-table thead th:last-child {
+  border-top-right-radius: 9px;
+}
+
+/* On desktop the table fits, so let the status / action dropdown menus show outside the table.
+   On smaller screens the table scrolls horizontally and the menus open upwards when needed. */
+@media (min-width: 992px) {
+  .table-wrapper .table-responsive {
+    overflow: visible;
+  }
+}
+
+.pagination-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--card-border);
+  background: #fff;
+}
+
+.page-size-select {
+  width: auto;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--brand);
+  border-color: var(--brand);
+}
+
+.pagination .page-link {
+  color: var(--dark);
+}
+
+/* ---------- States ---------- */
+
+.loader-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3rem 1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-state-icon {
+  font-size: 2.5rem;
+  color: #adb5bd;
+  margin-bottom: 0.5rem;
+}
+
+.not-found {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+
+.not-found-code {
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--brand);
+}
+
+/* ---------- Forms ---------- */
+
+.form-card {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.form-title {
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.leave-box {
+  background-color: #fff8e6;
+  border: 1px dashed #e0b44a;
+  border-radius: 8px;
+  padding: 1rem 1rem 0;
+  margin-bottom: 1rem;
+}
+
+.employee-hint {
+  font-size: 0.8rem;
+  margin-top: -0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+/* ---------- Dashboard ---------- */
+
+.stat-card {
+  display: block;
+  height: 100%;
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  color: inherit;
+  text-decoration: none;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+a.stat-card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.stat-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.stat-dark { color: var(--dark); }
+.stat-green { color: #3a7d44; }
+.stat-grey { color: #6c757d; }
+.stat-orange { color: #c27c0e; }
+.stat-blue { color: #2f6db3; }
+.stat-brown { color: #9c4a2f; }
+.stat-red { color: #c0392b; }
+
+.section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.workload-bar {
+  min-width: 120px;
+  height: 8px;
+}
+
+/* ---------- View (details) pages ---------- */
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--brand-light);
+  color: var(--brand);
+  font-size: 1.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.detail-item {
+  margin-bottom: 1rem;
+}
+
+.detail-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  margin-bottom: 0.15rem;
+}
+
+.detail-value {
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.skill-chip {
+  display: inline-block;
+  background-color: var(--brand-light);
+  color: var(--brand);
+  border-radius: 20px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.8rem;
+  margin: 0 0.35rem 0.35rem 0;
+}
+
+.mini-stat {
+  text-align: center;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 0.6rem 0.25rem;
+  height: 100%;
+}
+
+.mini-stat-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.mini-stat-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.task-description {
+  white-space: pre-wrap;
+  color: #444;
+}
+
+/* Timeline on the task view page */
+.timeline {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.timeline-item {
+  position: relative;
+  padding: 0 0 1.1rem 1.6rem;
+  border-left: 2px solid var(--card-border);
+  margin-left: 0.4rem;
+}
+
+.timeline-item:last-child {
+  border-left-color: transparent;
+  padding-bottom: 0;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -7px;
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #adb5bd;
+}
+
+.timeline-dot.done { background-color: #3a7d44; }
+.timeline-dot.danger { background-color: #c0392b; }
+.timeline-dot.info { background-color: #2f6db3; }
+
+.timeline-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.timeline-date {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* ---------- Responsive tweaks ---------- */
+
+@media (max-width: 767.98px) {
+  .app-main {
+    padding-top: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.35rem;
+  }
+
+  .page-actions,
+  .page-actions .btn {
+    width: 100%;
+  }
+
+  .page-actions .btn {
+    flex: 1;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .search-box {
+    max-width: none;
+  }
+
+  .pagination-bar {
+    justify-content: center;
+  }
+}
