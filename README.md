@@ -10,8 +10,11 @@ The frontend also validates fields for a better user experience, but it never re
 
 | | Link |
 |---|---|
-| Frontend (live) | `<add frontend URL here>` |
-| Backend API (live) | `<add backend URL here>` (health check: `/api/health`) |
+| Frontend (live) | https://employee-management-app-164s.onrender.com |
+| Backend API (live) | https://employee-management-system-95gp.onrender.com/api (health check: [`/api/health`](https://employee-management-system-95gp.onrender.com/api/health)) |
+| Database | MongoDB Atlas |
+
+> Hosted on Render's free plan. If the site was not used for a while, the backend sleeps and the **first request can take about 30-50 seconds** to wake up. After that it is fast.
 
 ---
 
@@ -33,6 +36,12 @@ The frontend also validates fields for a better user experience, but it never re
 ---
 
 ## Features
+
+**Login** (extra, not required by the assignment)
+- Login page with email + password. Passwords are stored as a **bcrypt hash**, never as plain text.
+- The backend returns a **JWT token**. Every employee, task and dashboard API checks this token, so the data is protected on the server, not only hidden in the UI.
+- Pages are protected routes. After login the user goes back to the page they wanted. The session survives a refresh, and an expired token logs the user out automatically.
+- There is no sign-up page. Users are created with a script (see [Local Setup](#local-setup)), so no password is written in the code.
 
 **Dashboard**
 - Employee counts (Total / Active / Inactive / On Leave) and task counts (Total / Todo / In Progress / Completed / Cancelled / Overdue). All numbers come from the backend.
@@ -65,7 +74,7 @@ The frontend also validates fields for a better user experience, but it never re
 | Layer | Technology |
 |---|---|
 | Frontend | React 19 (Vite), React Router 7, React-Bootstrap 2 / Bootstrap 5, Axios, React-Toastify, React Icons |
-| Backend | Node.js, Express 5, Mongoose 9 |
+| Backend | Node.js, Express 5, Mongoose 9, bcryptjs (password hashing), jsonwebtoken (JWT login) |
 | Database | MongoDB (local or MongoDB Atlas) |
 
 ---
@@ -77,18 +86,20 @@ EmployeeManagment/
 ├── backend/
 │   ├── server.js                 # starts the server after connecting to MongoDB
 │   ├── seed/seed.js              # optional demo data (npm run seed)
+│   ├── seed/createUser.js        # creates a login user (npm run create-user)
 │   ├── .env.example
 │   └── src/
 │       ├── app.js                # express app, middlewares, routes
 │       ├── config/db.js          # MongoDB connection
 │       ├── constants/            # departments, statuses, allowed status transitions, limits
-│       ├── models/               # Employee, Task, Counter (for TSK-001 style IDs)
+│       ├── models/               # User, Employee, Task, Counter (for TSK-001 style IDs)
 │       ├── validators/           # request body validation (employee, task, status)
 │       ├── services/taskService.js  # ALL task business rules (assignment, capacity, status flow, overdue, filters)
-│       ├── controllers/          # request handlers (employee, task, dashboard)
+│       ├── controllers/          # request handlers (auth, employee, task, dashboard)
 │       ├── routes/               # API routes
-│       ├── middleware/errorHandler.js  # one place that converts errors to 400/404/409/500 JSON
-│       └── utils/                # ApiError, date helpers, pagination helpers, CSV builder
+│       ├── middleware/auth.js    # checks the JWT token on protected routes
+│       ├── middleware/errorHandler.js  # one place that converts errors to 400/401/404/409/500 JSON
+│       └── utils/                # ApiError, JWT token helpers, date helpers, pagination helpers, CSV builder
 │
 └── frontend/
     ├── .env.example
@@ -97,14 +108,16 @@ EmployeeManagment/
         ├── api/                  # axios client + one file per resource
         ├── components/
         │   ├── common/           # PageHeader, Loader, PaginationBar, ConfirmModal, FormField, StatusBadge, ...
-        │   ├── layout/           # Navbar + page layout
+        │   ├── auth/             # ProtectedRoute
+        │   ├── layout/           # Navbar (with user menu / logout) + page layout
         │   ├── employees/        # EmployeeForm, EmployeeTable, EmployeeFilters, TaskStatsGrid
         │   ├── tasks/            # TaskForm, TaskTable, TaskFilters, TaskStatusDropdown, DueDateRangeFilter, TaskTimeline
         │   └── dashboard/        # StatCard, WorkloadTable
+        ├── context/              # AuthContext (logged-in user, login, logout)
         ├── hooks/                # useUrlFilters (filters <-> URL), useFetch (loading / error state)
-        ├── pages/                # one component per route
+        ├── pages/                # one component per route (LoginPage, DashboardPage, employees/, tasks/)
         ├── constants/            # dropdown values, badge colours, sort options
-        └── utils/                # date formatting, form validation, file download
+        └── utils/                # date formatting, form validation, file download, token storage
 ```
 
 ---
@@ -118,8 +131,9 @@ EmployeeManagment/
 ```bash
 cd backend
 npm install
-cp .env.example .env        # then edit MONGO_URI if needed
+cp .env.example .env        # then edit MONGO_URI and set a JWT_SECRET
 npm run seed                # optional: adds 12 employees and 37 tasks (deletes existing data!)
+npm run create-user -- --name "Your Name" --email you@example.com --password yourPassword
 npm run dev                 # http://localhost:5000
 ```
 
@@ -134,6 +148,7 @@ npm run dev                 # http://localhost:5173
 
 Production build: `npm run build` (output in `frontend/dist`).
 
+> `create-user` saves the user with a hashed password. Running it again with the same email updates the name and password.
 > The seed data is only a dev/demo helper. The app itself never uses hardcoded data; everything comes from the API.
 > Seed dates are calculated from "today", so there are always overdue tasks and employees on leave in the demo.
 
@@ -148,6 +163,8 @@ Production build: `npm run build` (output in `frontend/dist`).
 | `PORT` | `5000` | Port of the API |
 | `MONGO_URI` | `mongodb://127.0.0.1:27017/employee_task_db` | MongoDB connection string (local or Atlas) |
 | `CLIENT_URL` | `http://localhost:5173` | Allowed frontend origin(s) for CORS. Separate several with a comma |
+| `JWT_SECRET` | long random string | Secret used to sign login tokens. Generate one with `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"` |
+| `JWT_EXPIRES_IN` | `1d` | How long a login stays valid |
 | `TZ` | `Asia/Kolkata` | Timezone used to decide "today" for the Overdue rule |
 | `NODE_ENV` | `development` | `production` hides internal error details |
 
@@ -170,6 +187,15 @@ Base URL: `/api`. Every response is JSON in the same format:
 // error
 { "success": false, "message": "Employee already has 3 active tasks. Please choose another employee.", "errors": { "assignedEmployee": "..." } }
 ```
+
+### Auth
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/auth/login` | Body `{ "email", "password" }`. Returns `{ token, user }` |
+| GET | `/auth/me` | Returns the logged-in user (token required) |
+
+All `/employees`, `/tasks` and `/dashboard` endpoints need the header `Authorization: Bearer <token>`, otherwise they return **401**. `/api/health` is public.
 
 ### Employees
 
@@ -226,6 +252,7 @@ Every task in a response also has calculated fields: `isOverdue`, `nextStatuses`
 |---|---|
 | 200 / 201 | Success / created |
 | 400 | Invalid data or a broken business rule (validation, inactive employee, leave clash, capacity, wrong status change, editing a closed task, deleting an employee with active tasks, invalid filters) |
+| 401 | Not logged in, invalid / expired token, or wrong email / password |
 | 404 | Employee / task / route not found (also for invalid ids) |
 | 409 | Duplicate Employee ID or email |
 | 500 | Unexpected server error |
@@ -267,6 +294,14 @@ Every task in a response also has calculated fields: `isOverdue`, `nextStatuses`
 | `startDate`, `dueDate` | Date | Required, `dueDate >= startDate` |
 | `completedDate` | Date | Set **only by the backend** when status becomes Completed |
 | `createdAt` | Date | Automatic = "Created Date" |
+
+### User
+
+| Field | Type | Rules |
+|---|---|---|
+| `name` | String | Required |
+| `email` | String | Required, **unique**, lowercase |
+| `password` | String | bcrypt hash, min 6 characters before hashing, never returned by the API (`select: false`) |
 
 ### Counter
 
@@ -321,7 +356,7 @@ Indexes exist on the fields used for filtering and sorting (`assignedEmployee + 
 - Start date can be in the past (for example to log work that already started).
 - Phone numbers are 10-digit Indian mobile numbers (start with 6-9). Employee ID is 3-20 characters of letters, numbers or `-`.
 - Task search by employee name uses the saved snapshot, so tasks of deleted employees are still searchable.
-- No login / authentication, as mentioned in the assignment.
+- Login was not required by the assignment. I added it as an extra with a single admin-style user and no sign-up page. Every logged-in user can do everything (no roles).
 
 ---
 
@@ -380,17 +415,17 @@ Each request is correct on its own, but together they break the limit. In my cur
 
 ## Deployment
 
-One free setup that works (any similar host is fine):
+The live version is deployed for free on **MongoDB Atlas + Render**:
 
-1. **Database – MongoDB Atlas:** create a free cluster, a database user, allow network access (`0.0.0.0/0` for Render) and copy the connection string.
-2. **Backend – Render (Web Service):**
-   - Root directory: `backend`, build command: `npm install`, start command: `npm start`
-   - Environment: `MONGO_URI=<atlas uri>`, `CLIENT_URL=<frontend url>`, `TZ=Asia/Kolkata`, `NODE_ENV=production`
-   - Optional: run `npm run seed` once from the Render shell to add demo data.
-3. **Frontend – Netlify or Vercel:**
-   - Base directory: `frontend`, build command: `npm run build`, publish directory: `dist`
-   - Environment: `VITE_API_URL=<render backend url>/api`
-   - Page refresh on routes like `/tasks/123` works because of `public/_redirects` (Netlify) and `vercel.json` (Vercel).
-4. Put both URLs at the top of this README.
+1. **Database – MongoDB Atlas:** free cluster, a database user, network access `0.0.0.0/0` (so Render can connect) and the connection string with the database name `employee_task_db`. Demo data was added with `npm run seed`.
+2. **Backend – Render Web Service:**
+   - Root directory: `backend`, build command: `npm install`, start command: `npm start`, health check path: `/api/health`
+   - Environment: `MONGO_URI=<atlas uri>`, `CLIENT_URL=<frontend url>`, `JWT_SECRET=<long random string>`, `TZ=Asia/Kolkata`, `NODE_ENV=production`
+   - The login user was created once with `npm run create-user` (pointing `MONGO_URI` to Atlas)
+3. **Frontend – Render Static Site:**
+   - Root directory: `frontend`, build command: `npm install && npm run build`, publish directory: `dist`
+   - Environment: `VITE_API_URL=<backend url>/api`
+   - Rewrite rule `/*` → `/index.html`, so refreshing routes like `/tasks/123` works (React Router handles them).
+   - The project also works on Netlify (`public/_redirects`) and Vercel (`vercel.json`).
 
 > Note: on Render's free plan the backend sleeps when unused, so the first request can take around 30-50 seconds.
